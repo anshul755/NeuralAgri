@@ -198,7 +198,7 @@ function Index() {
             <div className="relative w-full h-full overflow-hidden">
               <video
                 className="absolute top-0 left-0 w-full h-full object-cover"
-                src="/IMG_4637.mp4"
+                src="/videos/IMG_4637.MOV"
                 style={{borderEndStartRadius: "15%"}}
                 autoPlay
                 loop
