@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { MapPin, Thermometer, Calendar, Droplets, Wind, Languages, Cloud, CloudRain, Sun } from 'lucide-react';
 import BackgroundWrapper from "./BackgroundWrapper";
 
+// Extended translations object with new keys
 const translations = {
   english: {
     dashboard: "Farmer's Dashboard",
@@ -21,6 +22,13 @@ const translations = {
     locationNotFound: "Location access denied or not found, using default",
     soilMoistureLoading: "Loading soil moisture data...",
     soilMoistureError: "Failed to fetch soil moisture data",
+    recommendedCrops: "Recommended Crops",
+    currentSeason: "Current Season",
+    highDemandCrops: "High Demand Crops",
+    personalizedAdvice: "Personalized Advice",
+    monsoon: "Monsoon",
+    winter: "Winter",
+    summer: "Summer",
   },
   hindi: {
     dashboard: "किसान डैशबोर्ड",
@@ -39,8 +47,47 @@ const translations = {
     locationNotFound: "स्थान तक पहुंच अस्वीकृत या नहीं मिला, डिफ़ॉल्ट का उपयोग कर रहा है",
     soilMoistureLoading: "मिट्टी की नमी डेटा लोड हो रहा है...",
     soilMoistureError: "मिट्टी की नमी डेटा लाने में विफल",
+    recommendedCrops: "अनुशंसित फसलें",
+    currentSeason: "वर्तमान मौसम",
+    highDemandCrops: "उच्च मांग वाली फसलें",
+    personalizedAdvice: "व्यक्तिगत सलाह",
+    monsoon: "मानसून",
+    winter: "सर्दी",
+    summer: "ग्रीष्म",
   },
 };
+
+// Crop translations for bilingual display
+const cropTranslations = {
+  Rice: { en: "Rice", hi: "चावल" },
+  Soybean: { en: "Soybean", hi: "सोयाबीन" },
+  Cotton: { en: "Cotton", hi: "कपास" },
+  Maize: { en: "Maize", hi: "मक्का" },
+  Wheat: { en: "Wheat", hi: "गेहूं" },
+  Mustard: { en: "Mustard", hi: "सरसों" },
+  Potato: { en: "Potato", hi: "आलू" },
+  Peas: { en: "Peas", hi: "मटर" },
+  Groundnut: { en: "Groundnut", hi: "मूंगफली" },
+  Sunflower: { en: "Sunflower", hi: "सूरजमुखी" },
+  Vegetables: { en: "Vegetables", hi: "सब्जियां" },
+  OrganicVegetables: { en: "Organic Vegetables", hi: "जैविक सब्जियां" },
+  Pulses: { en: "Pulses", hi: "दालें" },
+  Oilseeds: { en: "Oilseeds", hi: "तिलहन" },
+  MedicinalHerbs: { en: "Medicinal Herbs", hi: "औषधीय जड़ी-बूटियां" },
+};
+
+// Recommended crops by state and season
+const recommendedCrops = {
+  Maharashtra: {
+    Monsoon: ["Rice", "Soybean", "Cotton", "Maize"],
+    Winter: ["Wheat", "Mustard", "Potato", "Peas"],
+    Summer: ["Groundnut", "Sunflower", "Vegetables"],
+  },
+  // Add more states here if needed; Maharashtra is default for now
+};
+
+// High-demand crops (static, market-relevant list)
+const highDemandCrops = ["OrganicVegetables", "Pulses", "Oilseeds", "MedicinalHerbs"];
 
 const weatherIcons = {
   Clear: <Sun className="w-6 h-6 text-yellow-500" />,
@@ -192,14 +239,14 @@ const Dashboard = () => {
     setSoilMoistureLoading(true);
     try {
       // Simulated API call to a server-side endpoint that queries GEE
-      const response = await fetch(`http://127.0.0.1:5000/moisture` , {
-        method : 'POST',
-        headers : {
-          'Content-Type' : 'application/json'
+      const response = await fetch(`http://127.0.0.1:5000/moisture`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
         },
-        body : JSON.stringify({
-          lat : lat,
-          lon : lon
+        body: JSON.stringify({
+          lat: lat,
+          lon: lon
         })
       });
       if (!response.ok) {
@@ -219,8 +266,6 @@ const Dashboard = () => {
     try {
       const position = await getCurrentPosition();
       const { latitude, longitude } = position.coords;
-      console.log(latitude);
-      console.log(longitude);
 
       await fetchWeatherData(latitude, longitude);
       await fetchSoilMoisture(latitude, longitude);
@@ -258,6 +303,21 @@ const Dashboard = () => {
   const cardHover = {
     hover: { scale: 1.03, boxShadow: "0px 8px 20px rgba(0, 0, 0, 0.15)" },
   };
+
+  // Seasonal Crop Recommendation Logic
+  const currentMonth = new Date().getMonth(); // 0 = January, 11 = December
+  const getSeason = (month) => {
+    if (month >= 2 && month <= 4) return "Summer"; // March-May
+    else if (month >= 5 && month <= 8) return "Monsoon"; // June-September
+    else return "Winter"; // October-February
+  };
+  const season = getSeason(currentMonth);
+  const state = location.state || "Maharashtra"; // Default to Maharashtra
+  const cropsForSeason = recommendedCrops[state]?.[season] || recommendedCrops["Maharashtra"][season];
+  const lang = language === "english" ? "en" : "hi";
+  const advice = language === "english"
+    ? `Based on your location in ${state}, and the current ${t[season.toLowerCase()]}, we recommend planting ${cropsForSeason.map(crop => cropTranslations[crop].en).join(", ")}. Additionally, considering the market demand, you might also consider ${highDemandCrops.map(crop => cropTranslations[crop].en).join(", ")}.`
+    : `आपके स्थान ${state} और वर्तमान ${t[season.toLowerCase()]} के आधार पर, हम ${cropsForSeason.map(crop => cropTranslations[crop].hi).join(", ")} की खेती करने की सलाह देते हैं। इसके अलावा, बाजार की मांग को ध्यान में रखते हुए, आप ${highDemandCrops.map(crop => cropTranslations[crop].hi).join(", ")} पर भी विचार कर सकते हैं।`;
 
   return (
     <BackgroundWrapper darkMode={true}>
@@ -447,12 +507,12 @@ const Dashboard = () => {
                     ? "Soil is dry. Consider irrigating soon."
                     : "मिट्टी सूखी है। जल्द ही सिंचाई पर विचार करें।"
                   : soilMoisture < 40
-                  ? language === "english"
-                    ? "Soil moisture is moderate. Monitor closely."
-                    : "मिट्टी की नमी मध्यम है। नज़दीकी से निगरानी करें।"
-                  : language === "english"
-                  ? "Soil moisture is optimal. No immediate action needed."
-                  : "मिट्टी की नमी इष्टतम है। तत्काल कार्रवाई की आवश्यकता नहीं है।"}
+                    ? language === "english"
+                      ? "Soil moisture is moderate. Monitor closely."
+                      : "मिट्टी की नमी मध्यम है। नज़दीकी से निगरानी करें।"
+                    : language === "english"
+                      ? "Soil moisture is optimal. No immediate action needed."
+                      : "मिट्टी की नमी इष्टतम है। तत्काल कार्रवाई की आवश्यकता नहीं है।"}
               </p>
             </div>
           ) : (
@@ -462,6 +522,7 @@ const Dashboard = () => {
           )}
         </motion.div>
 
+        {/* Updated Seasonal Crop Recommendation Section */}
         <motion.div
           variants={cardHover}
           whileHover="hover"
@@ -470,65 +531,43 @@ const Dashboard = () => {
           <div className="flex items-center mb-4">
             <Calendar className="h-5 w-5 text-green-600 dark:text-green-400 mr-2" />
             <h2 className="text-xl font-semibold text-green-800 dark:text-green-300">
-              {language === "english" ? "Seasonal Crop Recommendation" : "मौसमी फसल अनुशंसा"}
+              {t.recommendedCrops}
             </h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-green-100/80 dark:bg-green-900/50 p-4 rounded-lg">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
               <h3 className="font-semibold text-green-800 dark:text-green-300 mb-2">
-                {language === "english" ? "Current Season" : "वर्तमान मौसम"}
+                {t.currentSeason}
               </h3>
               <p className="text-green-700 dark:text-green-400 mb-2">
-                {language === "english" ? "Monsoon (June - September)" : "मानसून (जून - सितंबर)"}
+                {t[season.toLowerCase()]}
               </p>
+              <h4 className="font-medium text-green-800 dark:text-green-300 mb-1">
+                {t.recommendedCrops}
+              </h4>
               <ul className="list-disc list-inside text-green-700 dark:text-green-400">
-                <li>{language === "english" ? "Rice" : "चावल"}</li>
-                <li>{language === "english" ? "Soybean" : "सोयाबीन"}</li>
-                <li>{language === "english" ? "Cotton" : "कपास"}</li>
-                <li>{language === "english" ? "Maize" : "मक्का"}</li>
+                {cropsForSeason.map((crop, index) => (
+                  <li key={index}>{cropTranslations[crop][lang]}</li>
+                ))}
               </ul>
             </div>
-            <div className="bg-yellow-100/80 dark:bg-yellow-900/30 p-4 rounded-lg">
+            <div>
               <h3 className="font-semibold text-green-800 dark:text-green-300 mb-2">
-                {language === "english" ? "Upcoming Season" : "आगामी मौसम"}
+                {t.highDemandCrops}
               </h3>
-              <p className="text-green-700 dark:text-green-400 mb-2">
-                {language === "english" ? "Winter (October - January)" : "सर्दी (अक्टूबर - जनवरी)"}
-              </p>
               <ul className="list-disc list-inside text-green-700 dark:text-green-400">
-                <li>{language === "english" ? "Wheat" : "गेहूं"}</li>
-                <li>{language === "english" ? "Mustard" : "सरसों"}</li>
-                <li>{language === "english" ? "Potato" : "आलू"}</li>
-                <li>{language === "english" ? "Peas" : "मटर"}</li>
-              </ul>
-            </div>
-            <div className="bg-blue-100/80 dark:bg-blue-900/30 p-4 rounded-lg">
-              <h3 className="font-semibold text-green-800 dark:text-green-300 mb-2">
-                {language === "english" ? "Market Demand" : "बाजार मांग"}
-              </h3>
-              <p className="text-green-700 dark:text-green-400 mb-2">
-                {language === "english" ? "High Demand Crops" : "उच्च मांग वाली फसलें"}
-              </p>
-              <ul className="list-disc list-inside text-green-700 dark:text-green-400">
-                <li>{language === "english" ? "Organic Vegetables" : "जैविक सब्जियां"}</li>
-                <li>{language === "english" ? "Pulses" : "दालें"}</li>
-                <li>{language === "english" ? "Oilseeds" : "तिलहन"}</li>
-                <li>{language === "english" ? "Medicinal Herbs" : "औषधीय जड़ी-बूटियां"}</li>
+                {highDemandCrops.map((crop, index) => (
+                  <li key={index}>{cropTranslations[crop][lang]}</li>
+                ))}
               </ul>
             </div>
           </div>
           <div className="mt-4 p-4 bg-gradient-to-r from-green-100/80 to-blue-100/80 dark:from-green-900/50 dark:to-blue-900/30 rounded-lg">
             <h3 className="font-semibold text-green-800 dark:text-green-300 mb-2">
-              {language === "english" ? "Personalized Recommendation" : "व्यक्तिगत अनुशंसा"}
+              {t.personalizedAdvice}
             </h3>
             <p className="text-green-700 dark:text-green-400">
-              {language === "english"
-                ? `Based on your location (${location.district}, ${location.state}) and current weather conditions, we recommend focusing on ${
-                    location.state === "Maharashtra" ? "Rice, Cotton, and Soybean" : "Coffee, Rice, and Ragi"
-                  } cultivation for optimal yields and market returns.`
-                : `आपके स्थान (${location.district}, ${location.state}) और वर्तमान मौसम की स्थिति के आधार पर, हम इष्टतम उपज और बाजार रिटर्न के लिए ${
-                    location.state === "Maharashtra" ? "चावल, कपास और सोयाबीन" : "कॉफी, चावल और रागी"
-                  } की खेती पर ध्यान केंद्रित करने की सलाह देते हैं।`}
+              {advice}
             </p>
           </div>
         </motion.div>

@@ -1,12 +1,33 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  
+  const menuRef = useRef(null);
+  const buttonRef = useRef(null);
+
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
   };
+
+  // Close the menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(event.target) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target)
+      ) {
+        setMobileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <nav className="bg-green-900 p-4 text-white shadow-md">
@@ -15,7 +36,7 @@ const Navbar = () => {
           <i>NeuralAgri</i>
         </h1>
         <div className="md:hidden">
-          <button onClick={toggleMobileMenu}>
+          <button ref={buttonRef} onClick={toggleMobileMenu}>
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
@@ -40,7 +61,7 @@ const Navbar = () => {
               to="/chatbot"
               className="text-white px-4 py-2 rounded-md hover:bg-green-500 hover:text-black transition duration-300"
             >
-              <i><b>ChatBot</b></i>
+              <i><b>AgroAI</b></i>
             </Link>
           </li>
           <li>
@@ -79,7 +100,8 @@ const Navbar = () => {
       </div>
 
       <ul
-        className={`md:hidden mt-4 space-y-2 px-4 overflow-hidden transition-all duration-300 ${
+        ref={menuRef}
+        className={`md:hidden mt-4 space-y-2 px-4 overflow-y-auto transition-all duration-300 ${
           mobileMenuOpen ? "max-h-60" : "max-h-0"
         }`}
       >
@@ -98,7 +120,7 @@ const Navbar = () => {
             className="block text-white px-4 py-2 rounded-md hover:bg-green-500 hover:text-black transition duration-300"
             onClick={() => setMobileMenuOpen(false)}
           >
-            <i><b>ChatBot</b></i>
+            <i><b>AgroAI</b></i>
           </Link>
         </li>
         <li>
