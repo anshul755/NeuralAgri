@@ -2,8 +2,8 @@
 <resources>
     <color name="ic_launcher_background">#FFFFFF</color>
     <string name="app_name">NeuralAgri</string>
-    <string name="custom_url_scheme">com.DivineDhyana.NeuralAgri</string>
-    <string name="package_name">com.DivineDhyana.NeuralAgri</string>
+    <string name="custom_url_scheme">com.neuralagri.app</string>
+    <string name="package_name">com.neuralagri.app</string>
     <string name="title_activity_main">NeuralAgri</string>
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         

@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef } from "react"
-import BackgroundWrapper from "./BackgroundWrapper"
+import { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
+import BackgroundWrapper from "./BackgroundWrapper";
 
 function Index() {
   const translations = {
@@ -30,7 +31,7 @@ function Index() {
           "Farming isn't just about growing crops. It's about growing dreams. Each seed you plant carries hope. Each harvest tells a story of patience, resilience, and hard work. We know the challenges—the unpredictable weather, the diseases that strike without warning, the uncertainty of yield. But what if technology could become your helping hand? With AI-driven solutions, we aim to give back to the heart of our food system—you, the farmer. Imagine a world where your plants tell you what they need, where risks are minimized before they happen, and where every decision is backed by knowledge, not just guesswork. This isn't just technology. This is a revolution, built for those who feed the world.",
         button: "Thank You!!!!",
       },
-      mainTitle:"Welcome To NeuralAgri"
+      mainTitle: "Welcome To NeuralAgri",
     },
     hi: {
       title: "🌾 एआई के साथ कृषि में बदलाव",
@@ -59,31 +60,31 @@ function Index() {
           "खेती सिर्फ फसल उगाने के बारे में नहीं है, यह सपनों को उगाने का नाम है। हर बोया गया बीज आशा का प्रतीक है। हर कटाई धैर्य, सहनशीलता और कड़ी मेहनत की कहानी कहती है। हम चुनौतियों को जानते हैं—अनिश्चित मौसम, अचानक आने वाले रोग, और उपज की अनिश्चितता। लेकिन अगर तकनीक आपकी मददगार बन जाए? एआई-संचालित समाधानों के साथ, हम आपके जैसे किसान को सशक्त बनाने के लिए प्रतिबद्ध हैं। कल्पना कीजिए एक ऐसी दुनिया की जहाँ आपके पौधे आपको बताएँ कि उन्हें क्या चाहिए, जहाँ जोखिम कम से कम हों और हर निर्णय ज्ञान पर आधारित हो, सिर्फ अनुमान पर नहीं। यह केवल तकनीक नहीं है, यह एक क्रांति है, उन लोगों के लिए जो दुनिया को भोजन देते हैं।",
         button: "धन्यवाद!!!!",
       },
-      mainTitle:"न्यूरलएग्री में आपका स्वागत है"
+      mainTitle: "न्यूरलएग्री में आपका स्वागत है",
     },
-  }
+  };
 
-  const [language, setLanguage] = useState("hi")
-  const scrollRef = useRef(null)
-  const totalSections = 4
+  const [language, setLanguage] = useState("hi");
+  const scrollRef = useRef(null);
+  const totalSections = 4;
 
   useEffect(() => {
-    let currentIndex = 0
+    let currentIndex = 0;
     const interval = setInterval(() => {
-      currentIndex = (currentIndex + 1) % totalSections
+      currentIndex = (currentIndex + 1) % totalSections;
       if (scrollRef.current) {
         scrollRef.current.scrollTo({
           top: currentIndex * window.innerHeight,
           behavior: "smooth",
-        })
+        });
       }
-    }, 10000)
-    return () => clearInterval(interval)
-  }, [])
+    }, 10000);
+    return () => clearInterval(interval);
+  }, []);
 
   const toggleLanguage = () => {
-    setLanguage((prevLang) => (prevLang === "en" ? "hi" : "en"))
-  }
+    setLanguage((prevLang) => (prevLang === "en" ? "hi" : "en"));
+  };
 
   return (
     <BackgroundWrapper>
@@ -144,9 +145,12 @@ function Index() {
                 <p className="text-sm sm:text-base md:text-lg mb-3 sm:mb-4">
                   {translations[language].yieldModel.description}
                 </p>
-                <button className="bg-green-700 hover:bg-green-400 hover:text-black text-white font-bold py-2 px-4 sm:px-6 rounded-lg transition duration-300 text-sm sm:text-base">
+                <Link
+                  to="/yield_form"
+                  className="bg-green-700 hover:bg-green-400 hover:text-black text-white font-bold py-2 px-4 sm:px-6 rounded-lg transition duration-300 text-sm sm:text-base"
+                >
                   {translations[language].learnMore}
-                </button>
+                </Link>
               </div>
               <div className="text-white">
                 <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-2 sm:mb-3">
@@ -155,12 +159,16 @@ function Index() {
                 <p className="text-sm sm:text-base md:text-lg mb-3 sm:mb-4">
                   {translations[language].diseaseModel.description}
                 </p>
-                <button className="bg-green-700 hover:bg-green-400 hover:text-black text-white font-bold py-2 px-4 sm:px-6 rounded-lg transition duration-300 text-sm sm:text-base">
+                <Link
+                  to="/cnn"
+                  className="bg-green-700 hover:bg-green-400 hover:text-black text-white font-bold py-2 px-4 sm:px-6 rounded-lg transition duration-300 text-sm sm:text-base"
+                >
                   {translations[language].learnMore}
-                </button>
+                </Link>
               </div>
             </div>
           </div>
+
           <div
             className="md:h-screen flex items-center justify-center bg-green-800 snap-start px-4 py-6"
             style={{
@@ -185,6 +193,7 @@ function Index() {
               </button>
             </div>
           </div>
+
           <div
             className="md:h-screen flex items-center justify-center snap-start transform hover:scale-101 transition duration-300"
             style={{
@@ -198,8 +207,8 @@ function Index() {
             <div className="relative w-full h-full overflow-hidden">
               <video
                 className="absolute top-0 left-0 w-full h-full object-cover"
-                src="/videos/IMG_4637.MOV"
-                style={{borderEndStartRadius: "15%"}}
+                src="https://www.dropbox.com/scl/fi/fdlx7jcw03tkt2wh82noe/IMG_4637.MOV?rlkey=9pxek948ztu3f1cj9f0ik3aqc&st=c0swblvl&raw=1"
+                style={{ borderEndStartRadius: "15%" }}
                 autoPlay
                 loop
                 muted
@@ -225,10 +234,9 @@ function Index() {
             }}
           />
         </div>
-
       </div>
     </BackgroundWrapper>
-  )
+  );
 }
 
 export default Index;

@@ -1,0 +1,6 @@
+{
+  "appId": "com.neuralagri.app",
+  "appName": "frontend",
+  "webDir": "build",
+  "bundledWebRuntime": false
+}
